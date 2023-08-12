@@ -1,0 +1,43 @@
+const puppeteer = require('puppeteer');
+
+(async () => {
+  try {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+    await page.goto('https://intoli.com/blog/scrape-infinite-scroll/demo.html');
+
+    const scrollSelector = '.container'; // Adjust this selector based on the page's structure
+
+    await page.waitForSelector(scrollSelector);
+
+    let previousHeight = await page.evaluate(scrollSelector => {
+      const element = document.querySelector(scrollSelector);
+      return element.scrollHeight;
+    }, scrollSelector);
+
+    while (true) {
+      await page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      await page.waitForTimeout(1000); // Adjust the timeout as needed
+
+      const newHeight = await page.evaluate(scrollSelector => {
+        const element = document.querySelector(scrollSelector);
+        return element.scrollHeight;
+      }, scrollSelector);
+
+      if (newHeight === previousHeight) {
+        break;
+      }
+      previousHeight = newHeight;
+    }
+
+    // Now you can continue with whatever scraping or interaction you need to do
+    // For example, extracting information from the loaded content
+
+    await browser.close();
+  } catch (error) {
+    console.error("An error occurred:", error);
+  }
+})();
