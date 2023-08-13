@@ -31,5 +31,5 @@ const scrapeInfiniteScrollItems = async (page, itemTargetCount) => {
 
   const items = await scrapeInfiniteScrollItems(page, 100);
 
-  fs.writeFileSync("items.json", JSON.stringify(items));
+  fs.writeFileSync("itemcollection.json", JSON.stringify(items));
 })();
